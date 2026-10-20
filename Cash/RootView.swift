@@ -30,7 +30,7 @@ struct RootView: View {
         .sheet(isPresented: $showSend) { sendSheet }
         .sheet(isPresented: $showRequest) { amountSheet(title: "Request money", subtitle: "Create a demo request", actionTitle: "Create request") { if let person = wallet.people.first { wallet.request(from: person, amount: amount, note: "Payment request") }; toast = "Demo request created" } }
         .sheet(isPresented: $showFamily) { familySheet }
-        .alert("Stax Demo", isPresented: Binding(get: { toast != nil }, set: { if !$0 { toast = nil } })) { Button("OK") { toast = nil } } message: { Text(toast ?? "") }
+        .alert("Cash Demo", isPresented: Binding(get: { toast != nil }, set: { if !$0 { toast = nil } })) { Button("OK") { toast = nil } } message: { Text(toast ?? "") }
     }
 
     private var home: some View {
@@ -110,7 +110,7 @@ struct RootView: View {
                             }
                         }
                     }
-                    Text("Stax is an independent demo project. Transactions and balances are simulated.")
+                    Text("Cash is an independent demo project. Transactions and balances are simulated.")
                         .font(.system(size: 11)).foregroundStyle(.secondary).multilineTextAlignment(.center).padding(.horizontal, 12).padding(.bottom, 12)
                 }
                 .padding(18)
