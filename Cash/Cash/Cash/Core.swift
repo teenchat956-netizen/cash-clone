@@ -394,4 +394,70 @@ final class Wallet: ObservableObject {
         let b = Seed.bag()
         if let s = Disk.load() {
             profile = s.profile; balance = s.balance; txns = s.txns
-            people = s
+            people = s; family = s.family; card = s.card; holdings = s.holdings
+            goals = s.goals; budgets = s.budgets; notes = s.notes; settings = s.settings
+        } else {
+            profile = b.profile; balance = b.balance; txns = b.txns; people = b.people
+            family = b.family; card = b.card; holdings = b.holdings; goals = b.goals
+            budgets = b.budgets; notes = b.notes; settings = Settings()
+        }
+        quotes = Seed.fallback()
+        objectWillChange
+            .debounce(for: .milliseconds(350), scheduler: RunLoop.main)
+            .sink { [weak self] _ in self?.persist() }
+            .store(in: &bag)
+    }
+
+    private func persist() {
+        Disk.save(Snapshot(profile: profile, balance: balance, txns: txns,
+            people: people, family: family, card: card, holdings: holdings,
+            goals: goals, budgets: budgets, notes: notes, settings: settings))
+    }
+
+    func send(to person: Person, amount: Decimal, note: String = "") {
+        guard amount > 0, balance >= amount else { return }
+        balance -= amount
+        txns.insert(Txn(kind: .sent, title: person.name, subtitle: note.isEmpty ? "Demo payment" : note,
+            amount: -amount, note: note, person: person.name), at: 0)
+    }
+
+    func request(from person: Person, amount: Decimal, note: String = "") {
+        guard amount > 0 else { return }
+        txns.insert(Txn(kind: .request, title: person.name, subtitle: note.isEmpty ? "Payment requested" : note,
+            amount: amount, note: note, person: person.name, pending: true), at: 0)
+    }
+
+    func deposit(_ amount: Decimal) {
+        guard amount > 0 else { return }
+        balance += amount
+        txns.insert(Txn(kind: .deposit, title: "Added money", subtitle: "Demo balance", amount: amount), at: 0)
+    }
+
+    func withdraw(_ amount: Decimal) {
+        guard amount > 0, balance >= amount else { return }
+        balance -= amount
+        txns.insert(Txn(kind: .withdrawal, title: "Withdrawal", subtitle: "Demo transfer", amount: -amount), at: 0)
+    }
+
+    func contribute(to goalID: UUID, amount: Decimal) {
+        guard amount > 0, balance >= amount, let i = goals.firstIndex(where: { $0.id == goalID }) else { return }
+        balance -= amount
+        goals[i].saved += amount
+    }
+
+    func resetDemo() {
+        Disk.wipe()
+        let b = Seed.bag()
+        profile = b.profile; balance = b.balance; txns = b.txns; people = b.people
+        family = b.family; card = b.card; holdings = b.holdings; goals = b.goals
+        budgets = b.budgets; notes = b.notes; settings = Settings()
+        quotes = Seed.fallback()
+    }
+
+    func pull() async {
+        market = .loading
+        quotes = Seed.fallback()
+        lastPull = Date()
+        market = .loaded
+    }
+}
