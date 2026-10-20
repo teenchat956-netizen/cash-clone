@@ -393,7 +393,7 @@ final class Wallet: ObservableObject {
         let b = Seed.bag()
         if let s = Disk.load() {
             profile = s.profile; balance = s.balance; txns = s.txns
-            people = s; family = s.family; card = s.card; holdings = s.holdings
+            people = s.people; family = s.family; card = s.card; holdings = s.holdings
             goals = s.goals; budgets = s.budgets; notes = s.notes; settings = s.settings
         } else {
             profile = b.profile; balance = b.balance; txns = b.txns; people = b.people
