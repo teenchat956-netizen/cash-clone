@@ -57,9 +57,9 @@ struct Sheet<Content: View>: View {
         }
         .background(Ink.sheet)
         .clipShape(UnevenRoundedRectangle(topLeadingRadius: Ink.sheetRadius,
-                                          topTrailingRadius: Ink.sheetRadius,
                                           bottomLeadingRadius: 0,
-                                          bottomTrailingRadius: 0))
+                                          bottomTrailingRadius: 0,
+                                          topTrailingRadius: Ink.sheetRadius))
     }
 }
 
