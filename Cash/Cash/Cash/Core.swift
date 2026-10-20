@@ -387,7 +387,6 @@ final class Wallet: ObservableObject {
     @Published var market: Load = .idle
     @Published var lastPull: Date?
 
-    private let svc = MarketService.shared
     private var bag = Set<AnyCancellable>()
 
     init() {
